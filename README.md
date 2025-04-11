@@ -1,6 +1,8 @@
 # MapLibre Google Street View
 
 A MapLibre GL JS plugin that adds Google Street View functionality with a draggable pegman control, similar to Google Maps.
+![chrome_TdOBF8ex2S](https://github.com/user-attachments/assets/0ea7189d-ae0b-412d-98f4-730f2d8eabe6)
+
 
 ## Features
 

@@ -1,0 +1,171 @@
+/* MapLibre Google StreetView Plugin Styles */
+
+/* Pegman Control styling based on Google Maps implementation */
+.maplibre-streetview-pegman-container {
+    position: absolute;
+    right: 10px;
+    /* Top position is set dynamically in JavaScript */
+    z-index: 10;
+    width: 40px;
+    height: 40px;
+    background-color: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    border-radius: 2px;
+    cursor: grab;
+    transition: background 0.2s ease;
+}
+
+.maplibre-streetview-pegman-container:hover {
+    background: linear-gradient(#d1d1d1, #F5F5F5, #fbfbfb);
+}
+
+.maplibre-streetview-pegman-container.dragging {
+    cursor: grabbing;
+}
+
+/* Add styling for when Street View coverage is active */
+.maplibre-streetview-pegman-container.streetview-layer-active {
+    background: linear-gradient(#d1d1d1, #F5F5F5, #fbfbfb);
+}
+
+.maplibre-streetview-pegman {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-image: url('./images/pegman.png');
+    background-position: -3px -55px; /* Default state */
+    background-size: 45px;
+    background-repeat: no-repeat;
+}
+
+.maplibre-streetview-pegman-container:hover .maplibre-streetview-pegman {
+    background-position: -3px -152px; /* Hover state */
+}
+
+.maplibre-streetview-pegman.dragging {
+    background-position: -3px -104px; /* Dragging state */
+}
+
+/* Style for active pegman when coverage layer is showing */
+.maplibre-streetview-pegman.active {
+    background-position: -3px -7px; /* Active state from sprite */
+}
+
+/* Street View overlay styling */
+.maplibre-streetview-street-view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    background: #fff;
+    display: none;
+    overflow: hidden;
+}
+
+.maplibre-streetview-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    overflow: hidden;
+}
+
+.maplibre-streetview-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 1001;
+    transition: background 0.2s ease;
+}
+
+.maplibre-streetview-close:hover {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+/* Pegman dragging element */
+.maplibre-streetview-pegman-marker {
+    position: absolute;
+    z-index: 9999;
+    width: 19px;
+    height: 32px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.maplibre-streetview-pegman-marker.active {
+    opacity: 1 !important;
+}
+
+.maplibre-streetview-pegman-marker::before {
+    position: relative;
+    z-index: 5;
+    display: block;
+    width: 19px;
+    height: 32px;
+    content: ' ';
+    background-image: url('./images/cb_scout5.png');
+    background-repeat: no-repeat;
+    background-position: -112px -4px;
+}
+
+.maplibre-streetview-pegman-marker::after {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    content: ' ';
+    bottom: -18px;
+    left: 50%;
+    margin-left: -11px;
+    z-index: 4;
+    display: block;
+    border: 1px dotted rgba(51, 51, 51, 0.9);
+    border-radius: 30px;
+    background-color: rgba(105, 185, 70, 0.7);
+    box-shadow: 3px 10px 25px rgba(105, 185, 70, 0.9);
+}
+
+.gm-control-active gm-fullscreen-control {
+    display: none;
+}
+
+/* Street View not available notification */
+.maplibre-streetview-notification {
+    position: absolute;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    animation: fade-in-out 3s ease-in-out;
+}
+
+@keyframes fade-in-out {
+    0% { opacity: 0; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Hide Google Maps fullscreen control */
+.gm-fullscreen-control {
+    display: none !important;
+}

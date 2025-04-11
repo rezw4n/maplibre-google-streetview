@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MapLibre Google Street View Demo</title>
+    
+    <!-- MapLibre GL JS CSS -->
+    <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
+    
+    <!-- MapLibre Google Street View CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/@rezw4n/maplibre-google-streetview/dist/maplibre-google-streetview.css" rel="stylesheet" />
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .info-panel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            max-width: 300px;
+        }
+        
+        .info-panel h2 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+        
+        .info-panel p {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .api-key-form {
+            margin-top: 15px;
+        }
+        
+        .api-key-form input {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        
+        .api-key-form button {
+            padding: 8px 15px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <div class="info-panel">
+        <h2>MapLibre Google Street View Demo</h2>
+        <p>Click and drag the pegman 🧍‍♂️ to see Street View coverage. Drop on blue lines to open Street View.</p>
+        
+        <div class="api-key-form">
+            <input type="text" id="api-key-input" placeholder="Enter Google Maps API Key" />
+            <button id="initialize-button">Initialize Street View</button>
+        </div>
+    </div>
+
+    <!-- MapLibre GL JS -->
+    <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+    
+    <!-- MapLibre Google Street View -->
+    <script src="https://cdn.jsdelivr.net/npm/@rezw4n/maplibre-google-streetview/dist/maplibre-google-streetview.js"></script>
+    
+    <script>
+        // Initialize MapLibre map
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://demotiles.maplibre.org/style.json',
+            center: [-74.0066, 40.7135], // New York City
+            zoom: 15
+        });
+
+        // Add navigation control
+        map.addControl(new maplibregl.NavigationControl());
+
+        let streetViewPlugin = null;
+
+        // Initialize Button Click Handler
+        document.getElementById('initialize-button').addEventListener('click', function() {
+            const apiKey = document.getElementById('api-key-input').value.trim();
+            
+            if (!apiKey) {
+                alert('Please enter your Google Maps API Key');
+                return;
+            }
+            
+            // Remove existing instance if any
+            if (streetViewPlugin) {
+                streetViewPlugin.remove();
+            }
+            
+            // Initialize Street View plugin
+            try {
+                streetViewPlugin = new MaplibreGoogleStreetView({
+                    map: map,
+                    apiKey: apiKey,
+                    showPegmanButton: true
+                });
+                
+                alert('Street View initialized successfully! Look for the pegman control in the bottom right corner.');
+            } catch (error) {
+                alert('Error initializing Street View: ' + error.message);
+                console.error(error);
+            }
+        });
+
+        // Add event listener for map load
+        map.on('load', function() {
+            console.log('Map loaded successfully!');
+        });
+    </script>
+</body>
+</html>

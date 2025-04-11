@@ -1,0 +1,51 @@
+{
+  "name": "@rezw4n/maplibre-google-streetview",
+  "version": "1.0.6",
+  "description": "A MapLibre plugin that adds Google Street View functionality with pegman control",
+  "main": "dist/maplibre-google-streetview.js",
+  "module": "dist/maplibre-google-streetview.esm.js",
+  "types": "dist/maplibre-google-streetview.d.ts",
+  "type": "commonjs",
+  "scripts": {
+    "build": "rollup -c --bundleConfigAsCjs",
+    "dev": "rollup -c -w --bundleConfigAsCjs",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "maplibre",
+    "maps",
+    "streetview",
+    "google",
+    "pegman",
+    "maplibregl"
+  ],
+  "author": "Rezwan",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rezw4n/maplibre-google-streetview.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rezw4n/maplibre-google-streetview/issues"
+  },
+  "homepage": "https://github.com/rezw4n/maplibre-google-streetview#readme",
+  "peerDependencies": {
+    "maplibre-gl": ">=2.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "postcss": "^8.5.3",
+    "rollup": "^3.10.0",
+    "rollup-plugin-copy": "^3.4.0",
+    "rollup-plugin-postcss": "^4.0.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist",
+    "src"
+  ]
+}

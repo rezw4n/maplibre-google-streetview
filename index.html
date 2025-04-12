@@ -47,26 +47,6 @@
             font-size: 14px;
             line-height: 1.5;
         }
-        
-        .api-key-form {
-            margin-top: 15px;
-        }
-        
-        .api-key-form input {
-            width: 100%;
-            padding: 5px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-        }
-        
-        .api-key-form button {
-            padding: 8px 15px;
-            background-color: #4285f4;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -75,11 +55,6 @@
     <div class="info-panel">
         <h2>MapLibre Google Street View Demo</h2>
         <p>Click and drag the pegman 🧍‍♂️ to see Street View coverage. Drop on blue lines to open Street View.</p>
-        
-        <div class="api-key-form">
-            <input type="text" id="api-key-input" placeholder="Enter Google Maps API Key" />
-            <button id="initialize-button">Initialize Street View</button>
-        </div>
     </div>
 
     <!-- MapLibre GL JS -->
@@ -89,10 +64,33 @@
     <script src="https://cdn.jsdelivr.net/npm/@rezw4n/maplibre-google-streetview/dist/maplibre-google-streetview.js"></script>
     
     <script>
-        // Initialize MapLibre map
+        // Initialize MapLibre map with high resolution OpenStreetMap tiles
         const map = new maplibregl.Map({
             container: 'map',
-            style: 'https://demotiles.maplibre.org/style.json',
+            style: {
+                version: 8,
+                sources: {
+                    'osm-tiles': {
+                        type: 'raster',
+                        tiles: [
+                            'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                        ],
+                        tileSize: 256,
+                        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }
+                },
+                layers: [
+                    {
+                        id: 'osm-tiles',
+                        type: 'raster',
+                        source: 'osm-tiles',
+                        minzoom: 0,
+                        maxzoom: 19
+                    }
+                ]
+            },
             center: [-74.0066, 40.7135], // New York City
             zoom: 15
         });
@@ -102,38 +100,20 @@
 
         let streetViewPlugin = null;
 
-        // Initialize Button Click Handler
-        document.getElementById('initialize-button').addEventListener('click', function() {
-            const apiKey = document.getElementById('api-key-input').value.trim();
+        // Initialize Street View on map load
+        map.on('load', function() {
             
-            if (!apiKey) {
-                alert('Please enter your Google Maps API Key');
-                return;
-            }
-            
-            // Remove existing instance if any
-            if (streetViewPlugin) {
-                streetViewPlugin.remove();
-            }
-            
-            // Initialize Street View plugin
+            // Initialize Street View plugin with the provided API key
             try {
                 streetViewPlugin = new MaplibreGoogleStreetView({
                     map: map,
-                    apiKey: apiKey,
+                    apiKey: "AIzaSyAuzzMiIULrhPAHxplZd_ByhzHokJIBfqg",
                     showPegmanButton: true
                 });
                 
-                alert('Street View initialized successfully! Look for the pegman control in the bottom right corner.');
             } catch (error) {
-                alert('Error initializing Street View: ' + error.message);
-                console.error(error);
+                console.error('Error initializing Street View:', error);
             }
-        });
-
-        // Add event listener for map load
-        map.on('load', function() {
-            console.log('Map loaded successfully!');
         });
     </script>
 </body>

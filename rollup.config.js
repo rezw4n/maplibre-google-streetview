@@ -26,7 +26,12 @@ export default [
       postcss({
         inject: true,
         minimize: true,
-        extract: 'maplibre-google-streetview.css'
+        extract: 'maplibre-google-streetview.css',
+        url: {
+          url: 'inline',
+          maxSize: 10,
+          fallback: 'copy'
+        }
       }),
       terser(),
       copy({
@@ -50,7 +55,13 @@ export default [
       postcss({
         inject: false,
         minimize: false,
-        extract: 'maplibre-google-streetview.css'
+        extract: 'maplibre-google-streetview.css',
+        // Embed images as base64
+        url: {
+          url: 'inline',
+          maxSize: 10, // in kb
+          fallback: 'copy'
+        }
       })
     ]
   }

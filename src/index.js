@@ -125,6 +125,15 @@ class MapLibreGoogleStreetView {
    * @private
    */
   _setupEventListeners() {
+    // Stop map propagation on pegman hover
+    this.pegmanContainer.addEventListener('mouseenter', (e) => {
+      this.map.getCanvas().style.pointerEvents = 'none';
+    });
+    
+    this.pegmanContainer.addEventListener('mouseleave', (e) => {
+      this.map.getCanvas().style.pointerEvents = 'auto';
+    });
+    
     // Toggle Street View coverage when clicking on pegman button
     this.pegmanContainer.addEventListener('click', (e) => {
       // Only toggle if it's a direct click (not the start of a drag)
@@ -229,6 +238,9 @@ class MapLibreGoogleStreetView {
       // Prevent default to avoid scrolling the page while dragging pegman
       e.preventDefault();
       
+      // Disable map pointer events when touching pegman
+      this.map.getCanvas().style.pointerEvents = 'none';
+      
       // Track touch start to distinguish between tap and drag
       this.touchStartTime = Date.now();
       this.touchMoved = false;
@@ -273,6 +285,9 @@ class MapLibreGoogleStreetView {
     document.addEventListener('touchend', (e) => {
       // If this was a touch interaction
       if (this.isTouchInteraction) {
+        // Re-enable map pointer events when touch ends
+        this.map.getCanvas().style.pointerEvents = 'auto';
+        
         const touchDuration = Date.now() - this.touchStartTime;
         const touch = e.changedTouches[0];
         

@@ -1,6 +1,6 @@
 {
   "name": "@rezw4n/maplibre-google-streetview",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A MapLibre plugin that adds Google Street View functionality with pegman control",
   "main": "dist/maplibre-google-streetview.js",
   "module": "dist/maplibre-google-streetview.esm.js",

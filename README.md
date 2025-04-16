@@ -23,8 +23,8 @@ npm install @rezw4n/maplibre-google-streetview
 ### CDN
 
 ```html
-<link href="https://cdn.jsdelivr.net/npm/@rezw4n/maplibre-google-streetview/dist/maplibre-google-streetview.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/@rezw4n/maplibre-google-streetview/dist/maplibre-google-streetview.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/@rezw4n/maplibre-google-streetview@latest/dist/maplibre-google-streetview.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@rezw4n/maplibre-google-streetview@latest/dist/maplibre-google-streetview.js"></script>
 ```
 
 ## Requirements

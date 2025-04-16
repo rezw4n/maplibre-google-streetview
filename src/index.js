@@ -26,6 +26,11 @@ class MapLibreGoogleStreetView {
     this.pegmanMarker = null;
     this.streetViewLayerActive = false;
     
+    // Touch interaction tracking
+    this.touchStartTime = 0;
+    this.touchMoved = false;
+    this.isTouchInteraction = false;
+    
     // Create DOM elements
     this._createDOMElements();
     
@@ -224,28 +229,38 @@ class MapLibreGoogleStreetView {
       // Prevent default to avoid scrolling the page while dragging pegman
       e.preventDefault();
       
-      this.isDragging = true;
-      this.pegman.classList.add('dragging');
-      this.pegmanContainer.classList.add('dragging');
+      // Track touch start to distinguish between tap and drag
+      this.touchStartTime = Date.now();
+      this.touchMoved = false;
+      this.isTouchInteraction = true;
       
-      // Show and position the pegman marker at the touch point
-      this.pegmanMarker.classList.add('active');
-      
-      const touch = e.touches[0];
-      if (touch) {
-        this._updatePegmanMarkerPosition(touch);
-      }
-      
-      // Make sure Street View coverage is visible when dragging starts
-      if (!this.streetViewLayerActive) {
-        this._toggleStreetViewLayer();
-      }
+      // Don't immediately start dragging - will be determined in touchmove
+      // or touchend based on movement
     }, { passive: false });
     
     // Handle touchmove for updating pegman marker position
     document.addEventListener('touchmove', (e) => {
-      if (this.isDragging) {
-        e.preventDefault(); // Prevent page scrolling while dragging
+      if (this.isTouchInteraction) {
+        // Mark that touch has moved - this means it's a drag, not a tap
+        this.touchMoved = true;
+        
+        // Only now start the dragging if we haven't already
+        if (!this.isDragging) {
+          this.isDragging = true;
+          this.pegman.classList.add('dragging');
+          this.pegmanContainer.classList.add('dragging');
+          
+          // Show and position the pegman marker
+          this.pegmanMarker.classList.add('active');
+          
+          // Make sure Street View coverage is visible when dragging starts
+          if (!this.streetViewLayerActive) {
+            this._toggleStreetViewLayer();
+          }
+        }
+        
+        // Prevent page scrolling while dragging
+        e.preventDefault();
         
         const touch = e.touches[0];
         if (touch) {
@@ -256,43 +271,60 @@ class MapLibreGoogleStreetView {
     
     // Handle touchend (drop) on map
     document.addEventListener('touchend', (e) => {
-      if (this.isDragging) {
+      // If this was a touch interaction
+      if (this.isTouchInteraction) {
+        const touchDuration = Date.now() - this.touchStartTime;
         const touch = e.changedTouches[0];
-        if (touch) {
-          const mapContainer = this.map.getContainer();
-          const rect = mapContainer.getBoundingClientRect();
-          
-          // Check if touch ended inside the map container
-          if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
-              touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-              
-            // Convert touch point to map coordinates
-            const x = touch.clientX - rect.left;
-            const y = touch.clientY - rect.top;
+        
+        // If the touch didn't move much and was short duration, it's a tap
+        if (!this.touchMoved && touchDuration < 300) {
+          // If the tap was on the pegman button, toggle street view layer
+          if (touch && (this.pegman.contains(document.elementFromPoint(touch.clientX, touch.clientY)) || 
+                        this.pegmanContainer.contains(document.elementFromPoint(touch.clientX, touch.clientY)))) {
+            this._toggleStreetViewLayer();
+            e.preventDefault();
+          }
+        } 
+        // Otherwise it was a drag, so handle drag ending
+        else if (this.isDragging) {
+          if (touch) {
+            const mapContainer = this.map.getContainer();
+            const rect = mapContainer.getBoundingClientRect();
             
-            // Convert to geographic coordinates
-            const coords = this.map.unproject([x, y]);
-            
-            // Check if Street View is available at this location
-            this._checkStreetViewAvailability(coords.lat, coords.lng, (isAvailable) => {
-              if (isAvailable) {
-                this._openStreetView(coords.lat, coords.lng);
-              } else {
-                this._showNoStreetViewMessage();
-              }
+            // Check if touch ended inside the map container
+            if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+                touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+                
+              // Convert touch point to map coordinates
+              const x = touch.clientX - rect.left;
+              const y = touch.clientY - rect.top;
               
-              // Hide Street View coverage layer
-              if (this.streetViewLayerActive) {
-                this._toggleStreetViewLayer();
-              }
-            });
+              // Convert to geographic coordinates
+              const coords = this.map.unproject([x, y]);
+              
+              // Check if Street View is available at this location
+              this._checkStreetViewAvailability(coords.lat, coords.lng, (isAvailable) => {
+                if (isAvailable) {
+                  this._openStreetView(coords.lat, coords.lng);
+                } else {
+                  this._showNoStreetViewMessage();
+                }
+                
+                // Hide Street View coverage layer
+                if (this.streetViewLayerActive) {
+                  this._toggleStreetViewLayer();
+                }
+              });
+            }
           }
         }
         
-        // Reset dragging state
+        // Reset touch and drag states
         this._endDragging();
+        this.touchMoved = false;
+        this.isTouchInteraction = false;
       }
-    }, { passive: true });
+    }, { passive: false });
     
     // Handle map clicks to open Street View when coverage layer is active
     this.map.on('click', (e) => {
@@ -443,6 +475,10 @@ class MapLibreGoogleStreetView {
     if (this.pegmanMarker) {
       this.pegmanMarker.classList.remove('active');
     }
+    
+    // Reset touch states too
+    this.touchMoved = false;
+    this.isTouchInteraction = false;
   }
   
   /**

@@ -71,25 +71,41 @@
     overflow: hidden;
 }
 
+/* Close button with improved mobile support */
 .maplibre-streetview-close {
     position: absolute;
     top: 10px;
     right: 10px;
-    width: 30px;
-    height: 30px;
+    width: 44px;
+    height: 44px; /* Increased touch target size (Apple's recommended minimum) */
     background: rgba(0, 0, 0, 0.7);
     color: #fff;
     border-radius: 50%;
     text-align: center;
-    line-height: 30px;
-    font-size: 16px;
+    line-height: 44px;
+    font-size: 24px;
+    font-weight: bold;
     cursor: pointer;
     z-index: 1001;
     transition: background 0.2s ease;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0); /* Remove tap highlight on mobile */
+    touch-action: manipulation; /* Optimize for touch */
+    user-select: none; /* Prevent text selection */
 }
 
 .maplibre-streetview-close:hover {
     background: rgba(0, 0, 0, 0.9);
+}
+
+/* Ensure close button is accessible on smaller screens */
+@media (max-width: 768px) {
+    .maplibre-streetview-close {
+        top: 15px;
+        right: 15px;
+        width: 48px;
+        height: 48px;
+        line-height: 48px;
+    }
 }
 
 /* Pegman dragging element */
@@ -135,6 +151,10 @@
     box-shadow: 3px 10px 25px rgba(105, 185, 70, 0.9);
 }
 
+.gm-control-active gm-fullscreen-control {
+    display: none;
+}
+
 /* Street View not available notification */
 .maplibre-streetview-notification {
     position: absolute;
@@ -161,6 +181,7 @@
     100% { opacity: 0; }
 }
 
+/* Hide Google Maps fullscreen control */
 .gm-fullscreen-control {
     display: none !important;
 }

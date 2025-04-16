@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- Add permissions policy for accelerometer -->
+  <meta http-equiv="Permissions-Policy" content="accelerometer=*, gyroscope=*">
+  <title>MapLibre with Google Street View</title>
+
+  <!-- MapLibre GL JS -->
+  <link href="https://unpkg.com/maplibre-gl@3.2.0/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@3.2.0/dist/maplibre-gl.js"></script>
+
+  <!-- Maplibre Google Street View Plugin -->
+  <link href="https://cdn.jsdelivr.net/npm/@rezw4n/maplibre-google-streetview/dist/maplibre-google-streetview.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@rezw4n/maplibre-google-streetview/dist/maplibre-google-streetview.js"></script>
+
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+    /* Add styles to ensure proper iframe permissions */
+    #street-view-iframe {
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script>
+  // Initialize MapLibre
+  const map = new maplibregl.Map({
+    container: 'map',
+    style: 'https://demotiles.maplibre.org/style.json',
+    center: [-74.0066, 40.7135], // New York City
+    zoom: 15
+  });
+
+  // Add navigation controls
+  map.addControl(new maplibregl.NavigationControl());
+
+  // Initialize Street View plugin with options to handle permissions
+  const streetViewPlugin = new MaplibreGoogleStreetView({
+    map: map,
+    apiKey: 'AIzaSyAuzzMiIULrhPAHxplZd_ByhzHokJIBfqg',
+    iframeOptions: {
+      allow: 'accelerometer; gyroscope; geolocation'
+    }
+  });
+  
+  // Add event listener to fix iframe permissions after Street View is opened
+  document.addEventListener('DOMNodeInserted', function(event) {
+    if (event.target.id === 'street-view-iframe' || 
+        (event.target.tagName === 'IFRAME' && event.target.parentNode && event.target.parentNode.id === 'street-view')) {
+      event.target.setAttribute('allow', 'accelerometer; gyroscope; geolocation');
+    }
+  });
+</script>
+
+</body>
+</html>

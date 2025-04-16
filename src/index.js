@@ -62,11 +62,13 @@ class MapLibreGoogleStreetView {
     this.streetViewIframe.setAttribute('allowfullscreen', '');
     this.streetView.appendChild(this.streetViewIframe);
 
-    // Create close button
+    // Create close button with improved accessibility
     this.closeStreetView = document.createElement('div');
     this.closeStreetView.className = 'maplibre-streetview-close';
     this.closeStreetView.id = 'close-street-view';
     this.closeStreetView.innerHTML = '×';
+    this.closeStreetView.setAttribute('role', 'button');
+    this.closeStreetView.setAttribute('aria-label', 'Close Street View');
     this.streetView.appendChild(this.closeStreetView);
 
     // Append elements to the document
@@ -216,11 +218,119 @@ class MapLibreGoogleStreetView {
       this._endDragging();
     });
     
-    // Close street view when clicking the close button
-    this.closeStreetView.addEventListener('click', () => {
+    // MOBILE TOUCH SUPPORT
+    // Handle touchstart on pegman for mobile drag
+    this.pegman.addEventListener('touchstart', (e) => {
+      // Prevent default to avoid scrolling the page while dragging pegman
+      e.preventDefault();
+      
+      this.isDragging = true;
+      this.pegman.classList.add('dragging');
+      this.pegmanContainer.classList.add('dragging');
+      
+      // Show and position the pegman marker at the touch point
+      this.pegmanMarker.classList.add('active');
+      
+      const touch = e.touches[0];
+      if (touch) {
+        this._updatePegmanMarkerPosition(touch);
+      }
+      
+      // Make sure Street View coverage is visible when dragging starts
+      if (!this.streetViewLayerActive) {
+        this._toggleStreetViewLayer();
+      }
+    }, { passive: false });
+    
+    // Handle touchmove for updating pegman marker position
+    document.addEventListener('touchmove', (e) => {
+      if (this.isDragging) {
+        e.preventDefault(); // Prevent page scrolling while dragging
+        
+        const touch = e.touches[0];
+        if (touch) {
+          this._updatePegmanMarkerPosition(touch);
+        }
+      }
+    }, { passive: false });
+    
+    // Handle touchend (drop) on map
+    document.addEventListener('touchend', (e) => {
+      if (this.isDragging) {
+        const touch = e.changedTouches[0];
+        if (touch) {
+          const mapContainer = this.map.getContainer();
+          const rect = mapContainer.getBoundingClientRect();
+          
+          // Check if touch ended inside the map container
+          if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+              touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+              
+            // Convert touch point to map coordinates
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            
+            // Convert to geographic coordinates
+            const coords = this.map.unproject([x, y]);
+            
+            // Check if Street View is available at this location
+            this._checkStreetViewAvailability(coords.lat, coords.lng, (isAvailable) => {
+              if (isAvailable) {
+                this._openStreetView(coords.lat, coords.lng);
+              } else {
+                this._showNoStreetViewMessage();
+              }
+              
+              // Hide Street View coverage layer
+              if (this.streetViewLayerActive) {
+                this._toggleStreetViewLayer();
+              }
+            });
+          }
+        }
+        
+        // Reset dragging state
+        this._endDragging();
+      }
+    }, { passive: true });
+    
+    // Handle map clicks to open Street View when coverage layer is active
+    this.map.on('click', (e) => {
+      if (this.streetViewLayerActive) {
+        // Get clicked coordinates
+        const coords = e.lngLat;
+        
+        // Check if Street View is available at this location
+        this._checkStreetViewAvailability(coords.lat, coords.lng, (isAvailable) => {
+          if (isAvailable) {
+            this._openStreetView(coords.lat, coords.lng);
+            
+            // Hide Street View coverage layer after opening Street View
+            if (this.streetViewLayerActive) {
+              this._toggleStreetViewLayer();
+            }
+          } else {
+            this._showNoStreetViewMessage();
+          }
+        });
+      }
+    });
+    
+    // Close street view when clicking the close button - enhanced for mobile
+    this.closeStreetView.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       this.streetView.style.display = 'none';
       this.streetViewIframe.src = '';
     });
+    
+    // Add touch-specific event for mobile devices
+    this.closeStreetView.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.streetView.style.display = 'none';
+      this.streetViewIframe.src = '';
+    }, { passive: false });
   }
   
   /**
@@ -308,13 +418,17 @@ class MapLibreGoogleStreetView {
   /**
    * Update pegman marker position during drag
    * @private
-   * @param {Event} e - Mouse event
+   * @param {Event|Touch} e - Mouse event or Touch object
    */
   _updatePegmanMarkerPosition(e) {
     if (!this.isDragging || !this.pegmanMarker) return;
     
-    this.pegmanMarker.style.left = (e.clientX - 10) + 'px';
-    this.pegmanMarker.style.top = (e.clientY - 30) + 'px';
+    // Support both mouse events and touch objects
+    const clientX = e.clientX !== undefined ? e.clientX : e.pageX;
+    const clientY = e.clientY !== undefined ? e.clientY : e.pageY;
+    
+    this.pegmanMarker.style.left = (clientX - 10) + 'px';
+    this.pegmanMarker.style.top = (clientY - 30) + 'px';
   }
   
   /**

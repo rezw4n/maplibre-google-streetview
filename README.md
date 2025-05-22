@@ -41,7 +41,7 @@ npm install @rezw4n/maplibre-google-streetview
 ```javascript
 import MapLibreGL from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-iimport MaplibreGoogleStreetView from "@rezw4n/maplibre-google-streetview";
+import MaplibreGoogleStreetView from "@rezw4n/maplibre-google-streetview";
 import "@rezw4n/maplibre-google-streetview/dist/maplibre-google-streetview.css";
 
 // Initialize MapLibre map

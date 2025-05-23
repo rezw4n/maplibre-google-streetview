@@ -14,12 +14,6 @@ A MapLibre GL JS plugin that adds Google Street View functionality with a dragga
 
 ## Installation
 
-### npm
-
-```bash
-npm install @rezw4n/maplibre-google-streetview
-```
-
 ### CDN
 
 ```html
@@ -35,32 +29,102 @@ npm install @rezw4n/maplibre-google-streetview
   - Maps Embed API
 
 ## Usage
+Follow these steps to add Google Street View to your MapLibre map:
 
-### Basic Usage
+### 1. Include Dependencies
+
+First, you need to include the MapLibre GL JS library and the `maplibre-google-streetview` plugin in your HTML file.
+
+**CSS:**
+
+```html
+<!-- MapLibre GL JS CSS -->
+<link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
+
+<!-- MapLibre Google Street View CSS -->
+<link href="https://cdn.jsdelivr.net/npm/@rezw4n/maplibre-google-streetview@latest/dist/maplibre-google-streetview.css" rel="stylesheet" />
+```
+
+**JavaScript:**
+
+```html
+<!-- MapLibre GL JS -->
+<script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+
+<!-- MapLibre Google Street View JS -->
+<script src="https://cdn.jsdelivr.net/npm/@rezw4n/maplibre-google-streetview@latest/dist/maplibre-google-streetview.js"></script>
+```
+
+### 2. Add a Map Container
+
+Add a `div` element to your HTML to serve as the map container:
+
+```html
+<div id="map"></div>
+```
+
+Make sure to style the container appropriately (e.g., to take up the full screen or a specific portion of your page):
+
+```css
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
+```
+
+### 3. Initialize MapLibre GL JS
+
+Initialize your MapLibre map in your JavaScript code:
 
 ```javascript
-import MapLibreGL from 'maplibre-gl';
-import 'maplibre-gl/dist/maplibre-gl.css';
-import MaplibreGoogleStreetView from "@rezw4n/maplibre-google-streetview";
-import "@rezw4n/maplibre-google-streetview/dist/maplibre-google-streetview.css";
-
-// Initialize MapLibre map
-const map = new MapLibreGL.Map({
-  container: 'map',
-  style: 'https://demotiles.maplibre.org/style.json', // or your own style
-  center: [-74.0066, 40.7135], // New York City
-  zoom: 15
+const map = new maplibregl.Map({
+    container: 'map',
+    style: {
+        version: 8,
+        sources: {
+            'osm-tiles': {
+                type: 'raster',
+                tiles: [
+                    'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                ],
+                tileSize: 256,
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }
+        },
+        layers: [
+            {
+                id: 'osm-tiles',
+                type: 'raster',
+                source: 'osm-tiles',
+                minzoom: 0,
+                maxzoom: 19
+            }
+        ]
+    },
+    center: [-74.0066, 40.7135],
+    zoom: 15
 });
 
-// Add navigation control
-map.addControl(new MapLibreGL.NavigationControl());
-
-// Initialize Street View plugin
-const streetViewPlugin = new MaplibreGoogleStreetView({
-  map: map,
-  apiKey: 'YOUR_GOOGLE_MAPS_API_KEY'
-});
+// Optional: Add navigation control
+map.addControl(new maplibregl.NavigationControl());
 ```
+
+### 4. Initialize the Street View Plugin
+
+After the map has loaded, initialize the `MaplibreGoogleStreetView` plugin. You will need a Google Street View Static API key.
+
+```javascript
+map.on('load', () => streetViewPlugin = new MaplibreGoogleStreetView({ map, apiKey: "YOUR_GOOGLE_STREET_VIEW_API_KEY", showPegmanButton: true }));
+
+```
+
+**Important:** Replace `"YOUR_GOOGLE_STREET_VIEW_API_KEY"` with your actual Google Street View Static API key.
+
 
 ### Options
 

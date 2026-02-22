@@ -1,3 +1,4 @@
+# The package has been marked as deprecated. Please use [maplibre-pegman](https://github.com/rezw4n/maplibre-pegman).
 # MapLibre Google Street View
 
 A MapLibre GL JS plugin that adds Google Street View functionality with a draggable pegman control, similar to Google Maps.
